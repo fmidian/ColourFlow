@@ -1,19 +1,32 @@
 package sample.view;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.VPos;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 public class MainSceneController {
 
@@ -22,6 +35,9 @@ public class MainSceneController {
 
     @FXML
     private Canvas drawingGround;
+
+    @FXML
+    private Pane pane;
 
     private static final int RECT_WIDTH = 25;
     private static final int RECT_HEIGHT = 25;
@@ -42,10 +58,82 @@ public class MainSceneController {
         double height = drawingGround.getHeight() / 2;
         double width = drawingGround.getWidth() / 2;
 
-        writePixelsSimple(gc, height, width);
+//        showAnimation();
+//        showOnePixel(100,100);
+
+    }
+
+    private void showAnimation() {
+//        var rect = new Rectangle(20, 20, 60, 60);
+//        var circle = new Circle(1);
+
+        Text text = new Text();
+        text.setText("Hab dich auch lieb");
+        text.setTextOrigin(VPos.TOP);
+        text.setFont(Font.font(50));
+        text.setEffect(new Lighting());
+        text.setFill(Color.SALMON);
 
 
+        double sceneWidth = pane.getWidth();
+        double msgWidth = text.getLayoutBounds().getWidth();
 
+        KeyValue initKeyValue = new KeyValue(text.translateXProperty(), -500);
+        KeyFrame initFrame = new KeyFrame(Duration.ZERO, initKeyValue);
+
+        KeyValue endKeyValue = new KeyValue(text.translateXProperty(), 2.0
+                * msgWidth);
+        KeyFrame endFrame = new KeyFrame(Duration.seconds(3), endKeyValue);
+
+        Timeline timeline = new Timeline(initFrame, endFrame);
+
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.setAutoReverse(true);
+        timeline.play();
+
+        pane.getChildren().addAll(text);
+
+
+//        var tl = new Timeline();
+//
+//        tl.setCycleCount(2);
+//        tl.setAutoReverse(true);
+//
+//        var kv = new KeyValue(text.caretPositionProperty(), 200);
+//
+//        var kf = new KeyFrame(Duration.millis(2000), kv);
+//        tl.getKeyFrames().addAll(kf);
+//
+//
+//
+//        tl.play();
+//
+//        pane.getChildren().addAll(text);
+//        pane.getParent().setVisible(true);
+    }
+
+    public boolean showOnePixel(int x, int y) {
+
+        GraphicsContext gc = drawingGround.getGraphicsContext2D();
+        PixelWriter pixelWriter = gc.getPixelWriter();
+
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException exc) {
+                throw new Error("Unexpected interruption", exc);
+            }
+            Platform.runLater(() -> pixelWriter.setColor(x, y, Color.BLUEVIOLET));
+        });
+        thread.setDaemon(true);
+        thread.start();
+
+//        double height = drawingGround.getHeight() / 2;
+//        double width = drawingGround.getWidth() / 2;
+
+        boolean cont = true;
+        if(y > drawingGround.getHeight() || y<0) cont = false;
+        return cont;
     }
 
     private void writePixelsSimple(GraphicsContext gc, double height, double width)
@@ -54,7 +142,7 @@ public class MainSceneController {
         PixelWriter pixelWriter = gc.getPixelWriter();
 
         // Define the PixelFormat
-        PixelFormat<ByteBuffer> pixelFormat = PixelFormat.getByteRgbInstance();
+        WritablePixelFormat<IntBuffer> pixelFormat = PixelFormat.getIntArgbInstance();
 
         int h = (int) height;
         int w = (int) width;
@@ -66,6 +154,7 @@ public class MainSceneController {
         colorSome(true,true, w, h, height, c, pixelWriter);
         colorSome(false,true, w, h, height, c, pixelWriter);
         colorSome(false,false, w, h, height, c, pixelWriter);
+
 
     }
 
@@ -91,70 +180,10 @@ public class MainSceneController {
             for (h = h; h < 500 && h > 0; h = h + hi) {
 //                System.out.println(w+"  "+h);
 //            c.deriveColor(c.getBlue(), c.getGreen(), c.getHue(), c.getRed());
+
                 pixelWriter.setColor(w, h, c);
             }
         }
     }
 
-    private void writePixels(GraphicsContext gc)
-    {
-        // Define properties of the Image
-        int spacing = 5;
-        int imageWidth = 300;
-        int imageHeight = 100;
-        int rows = imageHeight/(RECT_HEIGHT + spacing);
-        int columns = imageWidth/(RECT_WIDTH + spacing);
-
-        // Get the Pixels
-        byte[] pixels = this.getPixelsData();
-
-        // Create the PixelWriter
-        PixelWriter pixelWriter = gc.getPixelWriter();
-
-        // Define the PixelFormat
-        PixelFormat<ByteBuffer> pixelFormat = PixelFormat.getByteRgbInstance();
-
-        // Write the pixels to the canvas
-        for (int y = 0; y < rows; y++)
-        {
-            for (int x = 0; x < columns; x++)
-            {
-                int xPos = 50 + x * (RECT_WIDTH + spacing);
-                int yPos = 50 + y * (RECT_HEIGHT + spacing);
-                pixelWriter.setPixels(xPos, yPos, RECT_WIDTH, RECT_HEIGHT,
-                        pixelFormat, pixels, 0, RECT_WIDTH * 3);
-            }
-        }
-    }
-
-    private byte[] getPixelsData()
-    {
-        // Create the Array
-        byte[] pixels = new byte[RECT_WIDTH * RECT_HEIGHT * 3];
-        // Set the ration
-        double ratio = 1.0 * RECT_HEIGHT/RECT_WIDTH;
-        // Generate pixel data
-        for (int y = 0; y < RECT_HEIGHT; y++)
-        {
-            for (int x = 0; x < RECT_WIDTH; x++)
-            {
-                int i = y * RECT_WIDTH * 3 + x * 3;
-                if (x <= y/ratio)
-                {
-                    pixels[i] = -1;
-                    pixels[i+1] = 1;
-                    pixels[i+2] = 0;
-                }
-                else
-                {
-                    pixels[i] = 1;
-                    pixels[i+1] = 1;
-                    pixels[i+2] = 0;
-                }
-            }
-        }
-
-        // Return the Pixels
-        return pixels;
-    }
 }
