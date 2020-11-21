@@ -1,4 +1,4 @@
-package sample;
+package sample.view;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
