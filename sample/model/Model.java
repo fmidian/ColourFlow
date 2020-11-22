@@ -9,10 +9,14 @@ public class Model {
 private Color[] [] pixelModel;
 private int [] firstPixel;
 private final Color startTransparentColor = new Color(0,0,0,0);
-double changerate = Math.random()*0.2;
+double changerate = 0.1;
+double changeRateUserComponent = 0.1;
 private int lastMinimalCounterState = 1;
 int cornerCounter = 0;
-private ArrayList<Integer[]> kitHole = new ArrayList<Integer[]>();
+
+
+
+    private ArrayList<Integer[]> kitHole = new ArrayList<Integer[]>();
 private boolean tokenKitHole = true;
 
     public Model() {
@@ -194,7 +198,7 @@ private boolean tokenKitHole = true;
         Color startColor = new Color(Math.random(),Math.random(),Math.random(),1);
         pixelModel[firstPixel[0]][firstPixel[1]] = startColor;
 
-        changerate = Math.random()*0.08+0.05;
+        this.setChangeRate(changeRateUserComponent);
         lastMinimalCounterState = 1;
     }
 
@@ -345,6 +349,17 @@ private boolean tokenKitHole = true;
 
     public void deleteHoleData() {
         this.kitHole.clear();
+    }
+
+    public double getChangeRateUserComponent() {
+        return changeRateUserComponent;
+    }
+
+    public void setChangeRate (double changeRateUserComponent) {
+        this.changeRateUserComponent = changeRateUserComponent;
+        this.changerate = changeRateUserComponent+0.05;
+
+        System.out.println("changerate "+changerate);
     }
 
 

@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
@@ -26,6 +27,9 @@ public class MainScene {
 
     @FXML
     private Canvas drawingGround;
+
+    @FXML
+    private Slider slider;
 
     private Controller controller;
 
@@ -55,6 +59,11 @@ public class MainScene {
         boolean sepiaTone = Math.random() > 0.8;
         if(sepiaTone) drawingGround.setEffect(new SepiaTone());
         else drawingGround.setEffect(null);
+    }
+
+    @FXML
+    public void sliderSet(){
+        controller.sliderValueChanged(slider.getValue());
     }
 
     @FXML
