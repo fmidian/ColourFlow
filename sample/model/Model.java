@@ -343,5 +343,9 @@ private boolean tokenKitHole = true;
         tokenKitHole = true;
     }
 
+    public void deleteHoleData() {
+        this.kitHole.clear();
+    }
+
 
 }
