@@ -74,7 +74,6 @@ public class MainScene {
         Objects.requireNonNull(drawingGround);
         Integer height = (int) drawingGround.getHeight();
         Integer width = (int) drawingGround.getWidth();
-        System.out.println(height);
 
 
         Map<String, Integer> size = new HashMap<String, Integer>();

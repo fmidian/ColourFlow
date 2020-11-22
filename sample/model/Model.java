@@ -11,6 +11,7 @@ private Color[] [] pixelModel;
 private int [] firstPixel;
 private final Color startTransparentColor = new Color(0,0,0,0);
 double changerate = Math.random()*0.2;
+private int lastMinimalCounterState = 1;
 
 
 
@@ -21,29 +22,59 @@ double changerate = Math.random()*0.2;
         if(! pixelModel[1][0].equals(startTransparentColor)) return true;
         int yPos = firstPixel[0] - counter;
         int xPos = firstPixel[1] - counter;
+        double distance = 1;
+        boolean allPixelsFilled = true;
 
-        for(yPos=yPos; yPos < firstPixel[0]+counter; yPos++){
+        for(int z=lastMinimalCounterState; z<= counter; z++) {
+            allPixelsFilled = true;
+            yPos = firstPixel[0] - z;
+            xPos = firstPixel[1] - z;
+
+            for (yPos = yPos; yPos < firstPixel[0] + z; yPos++) {
 //            yPos = yPos >= pixelModel.length ? pixelModel.length-1 : yPos;
-            if(xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
-            pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-        }
-        for(xPos=xPos; xPos < firstPixel[1]+counter; xPos++){
-            if(xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
+                if (distance <= counter) {
+                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
+                } else {
+                    allPixelsFilled = false;
+                }
+            }
+            for (xPos = xPos; xPos < firstPixel[1] + z; xPos++) {
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
 //            xPos = xPos >= pixelModel[0].length ? pixelModel[0].length-1 : xPos;
 //            yPos = yPos >= pixelModel.length ? pixelModel.length-1 : yPos;
-            pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-        }
-        for(yPos=yPos; yPos > firstPixel[0]-counter; yPos--){
-            if(xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
+                if (distance <= counter) {
+                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
+                } else {
+                    allPixelsFilled = false;
+                }
+            }
+            for (yPos = yPos; yPos > firstPixel[0] - z; yPos--) {
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
 //            yPos = yPos<0 ? 0 : yPos;
 //            xPos = xPos >= pixelModel[0].length ? pixelModel[0].length-1 : xPos;
-            pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-        }
-        for(xPos=xPos; xPos > firstPixel[1]-counter; xPos--){
-            if(xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
+                if (distance <= counter) {
+                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
+                } else {
+                    allPixelsFilled = false;
+                }
+            }
+            for (xPos = xPos; xPos > firstPixel[1] - z; xPos--) {
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
 //            xPos = xPos<0 ? 0 : xPos;
 //            yPos = yPos<0 ? 0 : yPos;
-            pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
+                double test = (Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2);
+                distance = Math.sqrt(test);
+                if (distance <= counter) {
+                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
+                } else {
+                    allPixelsFilled = false;
+                }
+            }
+            if(allPixelsFilled) lastMinimalCounterState = z>lastMinimalCounterState? z : lastMinimalCounterState;
         }
 
         return false;
@@ -79,10 +110,14 @@ double changerate = Math.random()*0.2;
             blue += pixelModel[yPos+1][xPos+1].getBlue();
             includedPixels+=1;
         }
+        if(includedPixels == 0) {
+            red += pixelModel[firstPixel[1]][firstPixel[0]].getRed();
+            green += pixelModel[firstPixel[1]][firstPixel[0]].getGreen();
+            blue += pixelModel[firstPixel[1]][firstPixel[0]].getBlue();
+            includedPixels+=1;
+        }
 
         boolean modeChangeAll = Math.random() > 0.99995;
-        if(modeChangeAll) System.out.println("ModeChangeAll");
-
         red/=includedPixels;
         green/=includedPixels;
         blue/=includedPixels;
@@ -114,25 +149,8 @@ double changerate = Math.random()*0.2;
         Color startColor = new Color(Math.random(),Math.random(),Math.random(),1);
         pixelModel[firstPixel[0]][firstPixel[1]] = startColor;
 
-        changerate = Math.random()*0.05+0.05;
-//        for(int i=0; i<pixelModel.length; i--) {
-//            for (int y = 0; y < pixelModel[0].length; y++) {
-//                pixelModel[i][y] = Color.BLACK;
-//            }
-//            i+=pixelModel.length;
-//        }
-//        pixelModel[0][0] = Color.BLACK;
-//        pixelModel[pixelModel.length-1][0] = Color.BLACK;
-//        pixelModel[0][0] = Color.BLACK;
-
-
-//        System.out.println(pixelModel);
-//        for(int i=0; i<pixelModel.length; i++) {
-//            for (int y = 0; y < pixelModel[0].length; y++) {
-//                if (pixelModel[i][y] != null) System.out.print(pixelModel[i][y] + " " + i + " " + y + " ||");
-////                System.out.println(" ");
-//            }
-//        }
+        changerate = Math.random()*0.08+0.05;
+        lastMinimalCounterState = 1;
     }
 
     public Color[][] getPixelModel() {
