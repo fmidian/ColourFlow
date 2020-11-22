@@ -42,6 +42,10 @@ public class MainScene {
 
     private Controller controller;
 
+    public Canvas getDrawingGround() {
+        return drawingGround;
+    }
+
     public void buttonStartAnimation() {
         controller.initAnimation();
     }

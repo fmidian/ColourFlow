@@ -52,8 +52,12 @@
     </MenuBar>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <children>
-            <Canvas fx:id="drawingGround" height="314.0" layoutX="119.0" layoutY="44.0" width="516.0" />
-            <Button fx:id="button" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonStartAnimation" text="Start Animation" />
+            <AnchorPane layoutX="108.0" layoutY="26.0" prefHeight="302.0" prefWidth="461.0">
+               <children>
+                  <Canvas fx:id="drawingGround" height="296.0" layoutX="4.0" layoutY="4.0" width="455.0" />
+               </children>
+            </AnchorPane>
+            <Button fx:id="button" mnemonicParsing="false" onAction="#buttonStartAnimation" text="Start Animation" />
       </children>
     </AnchorPane>
   </children>
