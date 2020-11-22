@@ -1,35 +1,17 @@
 package sample.view;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.VPos;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.Lighting;
 import javafx.scene.effect.SepiaTone;
-import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritablePixelFormat;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.util.Duration;
 import sample.controller.Controller;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -47,10 +29,27 @@ public class MainScene {
 
     private Controller controller;
 
+    private LocalDateTime mousePressed;
+    private LocalDateTime mouseReleased;
+
     public Canvas getDrawingGround() {
         return drawingGround;
     }
 
+    @FXML
+    public void mousePressed() {
+        mousePressed = LocalDateTime.now();
+    }
+
+    @FXML
+    public void mouseReleased(MouseEvent event) {
+        mouseReleased = LocalDateTime.now();
+        long diff = ChronoUnit.MILLIS.between(mousePressed, mouseReleased);
+        System.out.println("Mousetime "+diff);
+        controller.deleteHoleInDataAndRefill(diff, event);
+    }
+
+    @FXML
     public void buttonStartAnimation() {
         controller.initAnimation();
         boolean sepiaTone = Math.random() > 0.8;
@@ -58,8 +57,9 @@ public class MainScene {
         else drawingGround.setEffect(null);
     }
 
+    @FXML
     public void buttonClear() {
-        controller.deleteData();
+        controller.deleteAllData();
     }
 
     public Controller getController() {

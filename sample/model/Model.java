@@ -2,8 +2,7 @@ package sample.model;
 
 import javafx.scene.paint.Color;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 public class Model {
 
@@ -13,16 +12,16 @@ private final Color startTransparentColor = new Color(0,0,0,0);
 double changerate = Math.random()*0.2;
 private int lastMinimalCounterState = 1;
 int cornerCounter = 0;
-
-
+private ArrayList<Integer[]> kitHole = new ArrayList<Integer[]>();
+private boolean tokenKitHole = true;
 
     public Model() {
     }
 
     private boolean fillCorner() {
         cornerCounter = 0;
-        if(! pixelModel[0][0].equals(startTransparentColor)) {
-            System.out.println("Ended");
+        if(! pixelModel[0][0].equals(startTransparentColor) && ! pixelModel[pixelModel.length-1][0].equals(startTransparentColor)) {
+//            System.out.println("Ended");
             return true;
         }
             for(int i=firstPixel[0]; i<pixelModel.length; i++) {
@@ -199,8 +198,149 @@ int cornerCounter = 0;
         lastMinimalCounterState = 1;
     }
 
+    public void makeHole(int[] location, int radius) {
+        double distance = -1;
+        for(int i=0; i<pixelModel.length; i++) {
+            for(int v=0; v<pixelModel[0].length; v++){
+                distance = Math.sqrt((Math.pow(v - location[1],2)) + Math.pow((i - location[0]),2));
+                if(distance <= radius) {
+                    pixelModel[i][v] = startTransparentColor;
+                }
+            }
+        }
+    }
+
+    public void initRefillHole(List<Integer[]> border){
+        tokenKitHole = false;
+//        System.out.println("Used by init");
+        for(Integer[] b: border){
+            this.kitHole.add(b);
+        }
+//        System.out.println("init ready");
+
+        tokenKitHole = true;
+    }
+
     public Color[][] getPixelModel() {
         return pixelModel;
+    }
+
+    public void refillHole(){
+        if(tokenKitHole == false) {
+//            System.out.println("Warning");
+            return;
+        }
+//        System.out.println("Keine Warning");
+        tokenKitHole = false;
+        Integer [] n;
+        try {
+            if (kitHole.size() > 0) {
+                ArrayList<Integer[]> temp = new ArrayList<Integer[]>();
+                System.out.println(kitHole.size());
+                boolean contained = false;
+                for (Integer[] pixel : kitHole) {
+                    pixelModel[pixel[0]][pixel[1]] = determineColorByOtherPixels(pixel[0], pixel[1]);
+                    if (pixel[0] == 0 || pixel[0] == pixelModel.length - 1 || pixel[1] == 0 || pixel[1] == pixelModel[0].length - 1) {
+                        continue;
+                    }
+                    if (pixelModel[pixel[0] - 1][pixel[1] - 1].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0] - 1, pixel[1] - 1};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+
+                    if (pixelModel[pixel[0]][pixel[1] - 1].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0], pixel[1] - 1};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                    if (pixelModel[pixel[0] - 1][pixel[1]].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0] - 1, pixel[1]};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                    if (pixelModel[pixel[0] + 1][pixel[1] - 1].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0] + 1, pixel[1] - 1};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                    if (pixelModel[pixel[0] - 1][pixel[1] + 1].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0] - 1, pixel[1] + 1};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals( n[0]) && x[1].equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                    if (pixelModel[pixel[0] + 1][pixel[1]].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0] + 1, pixel[1]};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals( n[0]) && x[1].equals( n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                    if (pixelModel[pixel[0]][pixel[1] + 1].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0], pixel[1] + 1};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0].equals(n[0]) && x[1] .equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                    if (pixelModel[pixel[0] + 1][pixel[1] + 1].equals(startTransparentColor)){
+                        n = new Integer[]{pixel[0] + 1, pixel[1] + 1};
+                        contained = false;
+                        for(Integer[] x: temp){
+                            if(x[0] .equals(n[0]) && x[1] .equals(n[1])) {
+                                contained = true;
+                                break;
+                            }
+                        }
+                        if(!contained) temp.add(n);
+                    }
+                }
+                kitHole.clear();
+                kitHole.addAll(temp);
+            }
+        }
+        catch(ConcurrentModificationException e){
+            System.out.println("Exception catched");
+        }
+        tokenKitHole = true;
     }
 
 
