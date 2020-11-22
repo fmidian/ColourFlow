@@ -35,7 +35,10 @@ import java.util.Objects;
 public class MainScene {
 
     @FXML
-    private Button button;
+    private Button startButton;
+
+    @FXML
+    private Button clearButton;
 
     @FXML
     private Canvas drawingGround;
@@ -48,6 +51,10 @@ public class MainScene {
 
     public void buttonStartAnimation() {
         controller.initAnimation();
+    }
+
+    public void buttonClear() {
+        controller.deleteData();
     }
 
     public Controller getController() {
