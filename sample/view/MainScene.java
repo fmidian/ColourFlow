@@ -10,7 +10,9 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.effect.Effect;
 import javafx.scene.effect.Lighting;
+import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
@@ -51,6 +53,9 @@ public class MainScene {
 
     public void buttonStartAnimation() {
         controller.initAnimation();
+        boolean sepiaTone = Math.random() > 0.8;
+        if(sepiaTone) drawingGround.setEffect(new SepiaTone());
+        else drawingGround.setEffect(null);
     }
 
     public void buttonClear() {

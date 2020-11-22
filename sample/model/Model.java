@@ -10,6 +10,8 @@ public class Model {
 private Color[] [] pixelModel;
 private int [] firstPixel;
 private final Color startTransparentColor = new Color(0,0,0,0);
+double changerate = Math.random()*0.2;
+
 
 
     public Model() {
@@ -77,18 +79,29 @@ private final Color startTransparentColor = new Color(0,0,0,0);
             blue += pixelModel[yPos+1][xPos+1].getBlue();
             includedPixels+=1;
         }
-        red = red / includedPixels + (Math.random() - 0.5)*0.1;
-        green = green / includedPixels + (Math.random() - 0.5)*0.1;
-        blue = blue / includedPixels + (Math.random() - 0.5)*0.1;
 
-        if(red > 1.0) red = 1.0;
-        else if(red < 0.0) red = 0.0;
+        boolean modeChangeAll = Math.random() > 0.99995;
+        if(modeChangeAll) System.out.println("ModeChangeAll");
 
-        if(green > 1.0) green = 1.0;
-        else if(green < 0.0) green = 0.0;
-
-        if(blue > 1.0) blue = 1.0;
-        else if(blue < 0.0) blue = 0.0;
+        red/=includedPixels;
+        green/=includedPixels;
+        blue/=includedPixels;
+        double pickChangedColour = Math.random();
+        if(modeChangeAll || pickChangedColour < 0.33) {
+            red += (Math.random() - 0.5)*changerate;
+            if(red > 1.0) red = 1.0;
+            else if(red < 0.0) red = 0.0;
+        }
+        if(modeChangeAll || pickChangedColour > 0.66){
+            green += (Math.random() - 0.5)*changerate;
+            if(green > 1.0) green = 1.0;
+            else if(green < 0.0) green = 0.0;
+        }
+        if(modeChangeAll || (pickChangedColour > 0.33 && pickChangedColour <0.66)) {
+            blue += (Math.random() - 0.5)*changerate;
+            if(blue > 1.0) blue = 1.0;
+            else if(blue < 0.0) blue = 0.0;
+        }
 
         return new Color(red, green, blue, 1);
     }
@@ -100,6 +113,8 @@ private final Color startTransparentColor = new Color(0,0,0,0);
         firstPixel = new int[] {(int)Math.round(size.get("height") / 2.0), (int)Math.round(size.get("width") / 2.0)};
         Color startColor = new Color(Math.random(),Math.random(),Math.random(),1);
         pixelModel[firstPixel[0]][firstPixel[1]] = startColor;
+
+        changerate = Math.random()*0.05+0.05;
 //        for(int i=0; i<pixelModel.length; i--) {
 //            for (int y = 0; y < pixelModel[0].length; y++) {
 //                pixelModel[i][y] = Color.BLACK;
