@@ -30,7 +30,7 @@ public class View {
         }
         mainScene = loader.getController();
         primaryStage.setTitle("Colour-Progression");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
     }
 

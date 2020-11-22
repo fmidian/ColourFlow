@@ -12,14 +12,49 @@ private int [] firstPixel;
 private final Color startTransparentColor = new Color(0,0,0,0);
 double changerate = Math.random()*0.2;
 private int lastMinimalCounterState = 1;
+int cornerCounter = 0;
 
 
 
     public Model() {
     }
 
+    private boolean fillCorner() {
+        cornerCounter = 0;
+        if(! pixelModel[0][0].equals(startTransparentColor)) {
+            System.out.println("Ended");
+            return true;
+        }
+            for(int i=firstPixel[0]; i<pixelModel.length; i++) {
+            for(int v=0; v<pixelModel[0].length; v++){
+                if(pixelModel[i][v].equals(startTransparentColor)) {
+                    pixelModel[i][v] = determineColorByOtherPixels(i, v);
+                    cornerCounter++;
+                }
+            }
+            if(cornerCounter > 1) break;
+            }
+
+        cornerCounter = 0;
+        for(int i=firstPixel[0]; i<pixelModel.length; i--) {
+            for(int v=0; v<pixelModel[0].length; v++){
+                if(pixelModel[i][v].equals(startTransparentColor)) {
+                    pixelModel[i][v] = determineColorByOtherPixels(i, v);
+                    cornerCounter++;
+                }
+            }
+            if(cornerCounter > 1) break;
+        }
+
+        return false;
+    }
+
     public boolean addPixels(int counter) {
-        if(! pixelModel[1][0].equals(startTransparentColor)) return true;
+        if(! pixelModel[firstPixel[0]][0].equals(startTransparentColor)) {
+//        if(lastMinimalCounterState > firstPixel[1]) {
+//            System.out.println("last "+lastMinimalCounterState);
+            return fillCorner();
+        }
         int yPos = firstPixel[0] - counter;
         int xPos = firstPixel[1] - counter;
         double distance = 1;
@@ -32,7 +67,9 @@ private int lastMinimalCounterState = 1;
 
             for (yPos = yPos; yPos < firstPixel[0] + z; yPos++) {
 //            yPos = yPos >= pixelModel.length ? pixelModel.length-1 : yPos;
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) {
+                    continue;
+                }
                 distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
                 if (distance <= counter) {
                     pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
@@ -40,8 +77,11 @@ private int lastMinimalCounterState = 1;
                     allPixelsFilled = false;
                 }
             }
+
             for (xPos = xPos; xPos < firstPixel[1] + z; xPos++) {
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) {
+                    continue;
+                }
 //            xPos = xPos >= pixelModel[0].length ? pixelModel[0].length-1 : xPos;
 //            yPos = yPos >= pixelModel.length ? pixelModel.length-1 : yPos;
                 distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
@@ -51,8 +91,11 @@ private int lastMinimalCounterState = 1;
                     allPixelsFilled = false;
                 }
             }
+
             for (yPos = yPos; yPos > firstPixel[0] - z; yPos--) {
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0){
+                    continue;
+                }
 //            yPos = yPos<0 ? 0 : yPos;
 //            xPos = xPos >= pixelModel[0].length ? pixelModel[0].length-1 : xPos;
                 distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
@@ -62,8 +105,11 @@ private int lastMinimalCounterState = 1;
                     allPixelsFilled = false;
                 }
             }
+
             for (xPos = xPos; xPos > firstPixel[1] - z; xPos--) {
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) continue;
+                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) {
+                    continue;
+                }
 //            xPos = xPos<0 ? 0 : xPos;
 //            yPos = yPos<0 ? 0 : yPos;
                 double test = (Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2);
@@ -75,8 +121,8 @@ private int lastMinimalCounterState = 1;
                 }
             }
             if(allPixelsFilled) lastMinimalCounterState = z>lastMinimalCounterState? z : lastMinimalCounterState;
-        }
 
+        }
         return false;
     }
 

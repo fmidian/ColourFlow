@@ -7,11 +7,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.view.MainScene">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.view.MainScene">
   <children>
-      <AnchorPane prefHeight="493.0" prefWidth="800.0">
+      <AnchorPane prefHeight="400.0" prefWidth="600.0">
          <children>
-            <Canvas fx:id="drawingGround" height="500.0" layoutX="5.0" layoutY="4.0" width="788.0" />
+            <Canvas fx:id="drawingGround" height="320.0" layoutY="2.0" width="600.0" />
          </children>
       </AnchorPane>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="160.0" prefWidth="1366.0" VBox.vgrow="ALWAYS">
