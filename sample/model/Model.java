@@ -8,15 +8,35 @@ import java.util.Map;
 public class Model {
 
 private Color[] [] pixelModel;
+private int [] firstPixel;
+
 
     public Model() {
+    }
+
+    public void addPixels(int counter) {
+        int yPos = firstPixel[0] - counter;
+        int xPos = firstPixel[1] - counter;
+
+        for(yPos=yPos; yPos < firstPixel[0]+counter; yPos++){
+            pixelModel[yPos][xPos] = new Color(Math.random(),Math.random(),Math.random(),1);
+        }
+        for(xPos=xPos; xPos < firstPixel[1]+counter; xPos++){
+            pixelModel[yPos][xPos] = new Color(Math.random(),Math.random(),Math.random(),1);
+        }
+        for(yPos=yPos; yPos > firstPixel[0]-counter; yPos--){
+            pixelModel[yPos][xPos] = new Color(Math.random(),Math.random(),Math.random(),1);
+        }
+        for(xPos=xPos; xPos > firstPixel[1]-counter; xPos--){
+            pixelModel[yPos][xPos] = new Color(Math.random(),Math.random(),Math.random(),1);
+        }
     }
 
     public void generatePixelModel(Map<String, Integer> size) {
         this.pixelModel = new Color [size.get("height")][size.get("width")];
         for (Color[] row: pixelModel)
             Arrays.fill(row, new Color(0,0,0,0));
-        int [] firstPixel = new int[] {(int)Math.round(size.get("height") / 2.0), (int)Math.round(size.get("width") / 2.0)};
+        firstPixel = new int[] {(int)Math.round(size.get("height") / 2.0), (int)Math.round(size.get("width") / 2.0)};
         Color startColor = new Color(Math.random(),Math.random(),Math.random(),1);
         pixelModel[firstPixel[0]][firstPixel[1]] = startColor;
 //        pixelModel[0][0] = Color.BLACK;
