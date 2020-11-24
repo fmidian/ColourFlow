@@ -231,16 +231,13 @@ private boolean tokenKitHole = true;
 
     public void refillHole(){
         if(tokenKitHole == false) {
-//            System.out.println("Warning");
             return;
         }
-//        System.out.println("Keine Warning");
         tokenKitHole = false;
         Integer [] n;
         try {
             if (kitHole.size() > 0) {
                 ArrayList<Integer[]> temp = new ArrayList<Integer[]>();
-                System.out.println(kitHole.size());
                 boolean contained = false;
                 for (Integer[] pixel : kitHole) {
                     pixelModel[pixel[0]][pixel[1]] = determineColorByOtherPixels(pixel[0], pixel[1]);
@@ -343,6 +340,7 @@ private boolean tokenKitHole = true;
         }
         catch(ConcurrentModificationException e){
             System.out.println("Exception catched");
+            //TODO
         }
         tokenKitHole = true;
     }
@@ -359,7 +357,6 @@ private boolean tokenKitHole = true;
         this.changeRateUserComponent = changeRateUserComponent;
         this.changerate = changeRateUserComponent+0.05;
 
-        System.out.println("changerate "+changerate);
     }
 
 
