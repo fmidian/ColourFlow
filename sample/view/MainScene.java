@@ -56,7 +56,7 @@ public class MainScene {
     @FXML
     public void buttonStartAnimation() {
         controller.initAnimation();
-        boolean sepiaTone = Math.random() > 0.8;
+        boolean sepiaTone = Math.random() > 0.9;
         if(sepiaTone) drawingGround.setEffect(new SepiaTone());
         else drawingGround.setEffect(null);
     }
@@ -100,6 +100,8 @@ public class MainScene {
                 pixelWriter.setColor(y, i, pixels[i][y]);
             }
         }
+
+        //TODO Keine Casts
 //        pixelWriter.setColor(0, 0, Color.CHOCOLATE);
     }
 }

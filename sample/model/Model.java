@@ -15,6 +15,11 @@ private int lastMinimalCounterState = 1;
 int cornerCounter = 0;
 
 
+//TODO Use 2d Points import for coordinates
+//
+// TODO 
+// TODO Check every corner before stopping fillCorners
+
 
     private ArrayList<Integer[]> kitHole = new ArrayList<Integer[]>();
 private boolean tokenKitHole = true;
@@ -23,6 +28,8 @@ private boolean tokenKitHole = true;
     }
 
     private boolean fillCorner() {
+
+        //TODO Eventuell wie fillHoles ?
         cornerCounter = 0;
         if(! pixelModel[0][0].equals(startTransparentColor) && ! pixelModel[pixelModel.length-1][0].equals(startTransparentColor)) {
 //            System.out.println("Ended");
