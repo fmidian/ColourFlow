@@ -17,7 +17,7 @@ int cornerCounter = 0;
 //New
 private Map<Key, PixelPoint> pm = new HashMap<Key, PixelPoint>();
 private PixelPoint middlePixel;
-private final int granularity = 200;
+private final int granularity = 300;
 private PixelPoint notColoured;
 private int height;
 private int width;
@@ -330,13 +330,14 @@ private boolean tokenKitHole = true;
     }
 
     private void randomObstacle() {
-        for(int i=0; i<10000; i++) {
+        for(int i=0; i<100000; i++) {
             Key pos = new Key((int) (Math.random() * width), (int) (Math.random() * height));
 //            System.out.println(pos.getX()+ "             "+pos.getY());
             PixelPoint p = pm.get(pos);
-            double newAlt = p.getAltitude() - Math.random()/500;
-            for (int x = (int)(- Math.random()*8); x < (int)(Math.random()*8); x++) {
-                for (int y = (int) (- Math.random()*8); y < (int)(Math.random()*8); y++) {
+            double newAlt = p.getAltitude() - Math.random()/100000;
+            int size = 5;
+            for (int x = (int)(- Math.random()*size); x < (int)(Math.random()*size); x++) {
+                for (int y = (int) (- Math.random()*size); y < (int)(Math.random()*size); y++) {
 //                    System.out.println(x+" "+y);
                     Key k = new Key(pos.getX()+x, pos.getY()+y);
                     if(pm.containsKey(k)){
