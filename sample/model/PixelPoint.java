@@ -10,6 +10,8 @@ public class PixelPoint extends Point2D
 
     private Color color =  new Color(0,0,0,0);
 
+    private boolean isHoleBorder = false;
+
 
     public PixelPoint(int x, int y, double altitude) {
         super(x,y);
@@ -36,5 +38,13 @@ public class PixelPoint extends Point2D
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public boolean isHoleBorder() {
+        return isHoleBorder;
+    }
+
+    public void setHoleBorder(boolean holeBorder) {
+        isHoleBorder = holeBorder;
     }
 }

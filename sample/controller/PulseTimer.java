@@ -33,8 +33,6 @@ public class PulseTimer extends AnimationTimer {
         }
         view.getMainScene().writePixels(model.getPixelModel());
 
-        model.refillHole();
-
         counter += 1;
 
         //TODO Save counter step

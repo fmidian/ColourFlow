@@ -23,6 +23,8 @@ private PixelPoint notColoured;
 private int height;
 private int width;
 private boolean flowageMode = true;
+private List<PixelPoint> holeMiddles = new ArrayList<PixelPoint>();
+private List<Double> holeRadius = new ArrayList<Double>();
 
 //TODO Use 2d Points import for coordinates
 //
@@ -81,7 +83,7 @@ private boolean tokenKitHole = true;
 
     private boolean floatMovement(int counter) {
 
-            if (counter <= granularity) {
+            if (counter <= granularity || holeMiddles.size() > 0) {
                 //Naive Approach over the whole map. On my computer there are no performance problems.
                 //If there are problems, you could use a copy of pixelModel and remove the set pixels maybe
 
@@ -92,7 +94,29 @@ private boolean tokenKitHole = true;
                         if (pixel.getAltitude() >= currentAltitude && pixel.getAltitude() < oldAltitude) {
                             pixel.setColor(determineNewPixelColor(pixel,1));
                         }
+                        else if(pixel.isHoleBorder()) {
+                            pixel.setColor(determineNewPixelColor(pixel,1));
+                            pixel.setHoleBorder(false);
+                        }
+                        else{
+
+                            for(int i=0; i<holeMiddles.size(); i++){
+                                double distance = holeMiddles.get(i).distance(pixel);
+                                Double radius = holeRadius.get(i);
+                                if(radius == -1) {
+                                    holeMiddles.remove(i);
+                                    holeRadius.remove(i);
+                                }
+                                else if(distance <= radius && distance > radius -1.0){
+                                    pixel.setHoleBorder(true);
+                                }
+                            }
+                        }
                 });
+
+                for(int i=0; i<holeRadius.size(); i++){
+                    holeRadius.set(i, holeRadius.get(i)-1);
+                }
                 return false;
             }
 
@@ -212,10 +236,16 @@ private boolean tokenKitHole = true;
     public void makeHole(Key middlePosition, int radius) {
         PixelPoint middle = pixelModel.get(middlePosition);
         pixelModel.forEach( (key, pixel) -> {
-            if(middle.distance(pixel) <= radius) {
+            double distance = middle.distance(pixel);
+            if(distance <= radius) {
                 pixel.setColor(startTransparentColor);
+                if(distance > radius-1) {
+                    pixel.setHoleBorder(true);
+                }
             }
         });
+        holeMiddles.add(middle);
+        holeRadius.add(radius-1.0);
     }
 
     public void initRefillHole(List<Integer[]> border){
@@ -233,124 +263,9 @@ private boolean tokenKitHole = true;
         return deprecatedModel;
     }
 
-    public void refillHole(){
-//        if(tokenKitHole == false) {
-//            return;
-//        }
-//        tokenKitHole = false;
-//        Integer [] n;
-//        try {
-//            if (kitHole.size() > 0) {
-//                ArrayList<Integer[]> temp = new ArrayList<Integer[]>();
-//                boolean contained = false;
-//                for (Integer[] pixel : kitHole) {
-//                    deprecatedModel[pixel[0]][pixel[1]] = determineNewPixelColor(pixelModel.get(new Key(pixel[1])))
-//                    if (pixel[0] == 0 || pixel[0] == deprecatedModel.length - 1 || pixel[1] == 0 || pixel[1] == deprecatedModel[0].length - 1) {
-//                        continue;
-//                    }
-//                    if (deprecatedModel[pixel[0] - 1][pixel[1] - 1].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0] - 1, pixel[1] - 1};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//
-//                    if (deprecatedModel[pixel[0]][pixel[1] - 1].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0], pixel[1] - 1};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                    if (deprecatedModel[pixel[0] - 1][pixel[1]].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0] - 1, pixel[1]};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                    if (deprecatedModel[pixel[0] + 1][pixel[1] - 1].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0] + 1, pixel[1] - 1};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                    if (deprecatedModel[pixel[0] - 1][pixel[1] + 1].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0] - 1, pixel[1] + 1};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals( n[0]) && x[1].equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                    if (deprecatedModel[pixel[0] + 1][pixel[1]].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0] + 1, pixel[1]};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals( n[0]) && x[1].equals( n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                    if (deprecatedModel[pixel[0]][pixel[1] + 1].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0], pixel[1] + 1};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0].equals(n[0]) && x[1] .equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                    if (deprecatedModel[pixel[0] + 1][pixel[1] + 1].equals(startTransparentColor)){
-//                        n = new Integer[]{pixel[0] + 1, pixel[1] + 1};
-//                        contained = false;
-//                        for(Integer[] x: temp){
-//                            if(x[0] .equals(n[0]) && x[1] .equals(n[1])) {
-//                                contained = true;
-//                                break;
-//                            }
-//                        }
-//                        if(!contained) temp.add(n);
-//                    }
-//                }
-//                kitHole.clear();
-//                kitHole.addAll(temp);
-//            }
-//        }
-//        catch(ConcurrentModificationException e){
-//            System.out.println("Exception catched");
-//            //TODO
-//        }
-//        tokenKitHole = true;
-    }
-
     public void deleteHoleData() {
-        this.kitHole.clear();
+        this.holeMiddles.clear();
+        this.holeRadius.clear();
     }
 
     public double getChangeRateUserComponent() {
@@ -359,7 +274,7 @@ private boolean tokenKitHole = true;
 
     public void setChangeRate (double changeRateUserComponent) {
         this.changeRateUserComponent = changeRateUserComponent;
-        this.changerate = changeRateUserComponent+0.05;
+        this.changerate = changeRateUserComponent;
 
     }
 
