@@ -1,11 +1,11 @@
-package sample.view;
+package view;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import sample.controller.Controller;
-import sample.model.Model;
+import controller.Controller;
+import model.Model;
 
 import java.io.IOException;
 import java.util.Map;

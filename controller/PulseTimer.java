@@ -1,8 +1,8 @@
-package sample.controller;
+package controller;
 
 import javafx.animation.AnimationTimer;
-import sample.model.Model;
-import sample.view.View;
+import model.Model;
+import view.View;
 
 public class PulseTimer extends AnimationTimer {
 

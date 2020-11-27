@@ -1,4 +1,4 @@
-package sample.view;
+package view;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -9,10 +9,9 @@ import javafx.scene.control.Slider;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import sample.controller.Controller;
-import sample.model.Key;
-import sample.model.PixelPoint;
+import controller.Controller;
+import model.Key;
+import model.PixelPoint;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

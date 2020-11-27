@@ -1,9 +1,9 @@
-package sample.controller;
+package controller;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import sample.model.Model;
-import sample.view.View;
+import model.Model;
+import view.View;
 
 public class Main extends Application {
 
