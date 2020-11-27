@@ -12,7 +12,6 @@ public class PixelPoint extends Point2D
 
     private boolean isHoleBorder = false;
 
-
     public PixelPoint(int x, int y, double altitude) {
         super(x,y);
         this.altitude = altitude;
