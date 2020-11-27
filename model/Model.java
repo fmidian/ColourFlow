@@ -2,6 +2,8 @@ package model;
 
 import javafx.scene.paint.Color;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class Model {
@@ -125,22 +127,39 @@ private double changerate = 0.1;
     }
 
     private void addRandomObstacles() {
+        Instant start = Instant.now();
+
+        Key pos;
+        int size = 5;
+        final SplittableRandom random = new SplittableRandom();
         for(int i=0; i<100000; i++) {
-            Key pos = new Key((int) (Math.random() * width), (int) (Math.random() * height));
+            pos = new Key((random.nextInt(width)), random.nextInt(height));
             PixelPoint p = pixelModel.get(pos);
-            double newAlt = p.getAltitude() - Math.random()/300;
-            int size = 5;
-            for (int x = (int)(- Math.random()*size); x < (int)(Math.random()*size); x++) {
-                for (int y = (int) (- Math.random()*size); y < (int)(Math.random()*size); y++) {
-                    Key k = new Key(pos.getX()+x, pos.getY()+y);
-                    if(pixelModel.containsKey(k)){
-                        PixelPoint pn = pixelModel.get(k);
-                        pn.setAltitude(newAlt <= 0.0 ? pn.getAltitude() : newAlt);
+            double newAlt = p.getAltitude() - random.nextDouble()/300;
+            if(newAlt > 0){
+                for (int x = -random.nextInt(size); x < random.nextInt(size); x++) {
+                    for (int y = -random.nextInt(size); y < random.nextInt(size); y++) {
+                        Key k = new Key(pos.getX()+x, pos.getY()+y);
+                        if(pixelModel.containsKey(k)){
+                            PixelPoint pn = pixelModel.get(k);
+                            pn.setAltitude(newAlt);
+                        }
+                        else break;
                     }
                 }
             }
+
         }
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toMillis();
+        System.out.println(timeElapsed);
     }
+
+    /*
+            final SplittableRandom random = new SplittableRandom();
+        for(int i=0; i<100000; i++) {
+            pos = new Key((random.nextInt(width)), random.nextInt(height));
+     */
 
     //TODO Gradle
 
