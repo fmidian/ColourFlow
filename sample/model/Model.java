@@ -18,10 +18,11 @@ private final Color startTransparentColor = new Color(0,0,0,0);
 //New
 private Map<Key, PixelPoint> pixelModel = new HashMap<Key, PixelPoint>();
 private PixelPoint middlePixel;
-private final int granularity = 400;
+private int granularity = 400;
 private PixelPoint notColoured;
 private int height;
 private int width;
+private boolean flowageMode = true;
 
 //TODO Use 2d Points import for coordinates
 //
@@ -172,7 +173,12 @@ private boolean tokenKitHole = true;
         pixelModel.put(new Key((int) middlePixel.getX(), (int) middlePixel.getY()), middlePixel);
 
         this.setChangeRate(changeRateUserComponent);
-        addRandomObstacles();
+
+        if(flowageMode) {
+            granularity = 200;
+            addRandomObstacles();
+        }
+        else  granularity = 400;
     }
 
     private void addRandomObstacles() {
@@ -203,16 +209,13 @@ private boolean tokenKitHole = true;
 
     //TODO Gradle
 
-    public void makeHole(int[] location, int radius) {
-        double distance = -1;
-        for(int i = 0; i< deprecatedModel.length; i++) {
-            for(int v = 0; v< deprecatedModel[0].length; v++){
-                distance = Math.sqrt((Math.pow(v - location[1],2)) + Math.pow((i - location[0]),2));
-                if(distance <= radius) {
-                    deprecatedModel[i][v] = startTransparentColor;
-                }
+    public void makeHole(Key middlePosition, int radius) {
+        PixelPoint middle = pixelModel.get(middlePosition);
+        pixelModel.forEach( (key, pixel) -> {
+            if(middle.distance(pixel) <= radius) {
+                pixel.setColor(startTransparentColor);
             }
-        }
+        });
     }
 
     public void initRefillHole(List<Integer[]> border){
@@ -366,5 +369,11 @@ private boolean tokenKitHole = true;
 
     public void setPixelModel(Map<Key, PixelPoint> pixelModel) {
         this.pixelModel = pixelModel;
+    }
+
+    public void setFlowageMode(boolean flowage) {
+        flowageMode = flowage;
+//        if(flowageMode) granularity = 400;
+//        else granularity = 50;
     }
 }

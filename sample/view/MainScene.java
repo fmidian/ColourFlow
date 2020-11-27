@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.PixelWriter;
@@ -32,6 +33,9 @@ public class MainScene {
 
     @FXML
     private Slider slider;
+
+    @FXML
+    private CheckBox flowage;
 
     private Controller controller;
 
@@ -65,8 +69,12 @@ public class MainScene {
 
     @FXML
     public void sliderSet(){
-
         controller.sliderValueChanged(slider.getValue());
+    }
+
+    @FXML
+    public void flowageChange(){
+        controller.flowageValueChanged(flowage.isSelected());
     }
 
     @FXML
