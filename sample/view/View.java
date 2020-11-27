@@ -46,6 +46,7 @@ public class View {
     public Map<String, Integer> getSizeOfCanvas () {
         return mainScene.getSizeOfCanvas();
     }
+
     public MainScene getMainScene() {
         return mainScene;
     }

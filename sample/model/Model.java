@@ -14,6 +14,10 @@ double changeRateUserComponent = 0.1;
 private int lastMinimalCounterState = 1;
 int cornerCounter = 0;
 
+//New
+private Map<Key, PixelPoint> pm = new HashMap<Key, PixelPoint>();
+private PixelPoint middlePixel;
+
 
 //TODO Use 2d Points import for coordinates
 //
@@ -65,6 +69,16 @@ private boolean tokenKitHole = true;
 //            System.out.println("last "+lastMinimalCounterState);
             return fillCorner();
         }
+
+        //TODO Verästelung
+
+        //TODO Fließbewegung
+
+        return circleMovement(counter);
+
+    }
+
+    private boolean circleMovement(int counter) {
         int yPos = firstPixel[0] - counter;
         int xPos = firstPixel[1] - counter;
         double distance = 1;
@@ -198,16 +212,43 @@ private boolean tokenKitHole = true;
     }
 
     public void generatePixelModel(Map<String, Integer> size) {
-        this.pixelModel = new Color [size.get("height")][size.get("width")];
-        for (Color[] row: pixelModel)
-            Arrays.fill(row, startTransparentColor);
-        firstPixel = new int[] {(int)Math.round(size.get("height") / 2.0), (int)Math.round(size.get("width") / 2.0)};
-        Color startColor = new Color(Math.random(),Math.random(),Math.random(),1);
-        pixelModel[firstPixel[0]][firstPixel[1]] = startColor;
+//        this.pixelModel = new Color [size.get("height")][size.get("width")];
+//        for (Color[] row: pixelModel)
+//            Arrays.fill(row, startTransparentColor);
+//        firstPixel = new int[] {(int)Math.round(size.get("height") / 2.0), (int)Math.round(size.get("width") / 2.0)};
+//        Color startColor = new Color(Math.random(),Math.random(),Math.random(),1);
+//        pixelModel[firstPixel[0]][firstPixel[1]] = startColor;
+//
+//        this.setChangeRate(changeRateUserComponent);
+//        lastMinimalCounterState = 1;
+        this.generateAltitude(size);
+    }
+
+    private void generateAltitude(Map<String, Integer> size) {
+        Objects.requireNonNull(size);
+        middlePixel = new PixelPoint((int)Math.round(size.get("width") / 2.0), (int)Math.round(size.get("height") / 2.0), 1.0);
+        double maximumDistance = middlePixel.distance(new PixelPoint (0,0,0));
+        for(int x=0; x<(size.get("width")); x++){
+            for(int y=0; y<(size.get("height")); y++) {
+                PixelPoint pixel = new PixelPoint(x,y, 0);
+                double altitude = 1 - pixel.distance(middlePixel) / maximumDistance;
+                pixel.setAltitude(altitude);
+                pixel.setColor(new Color(altitude,0,0,1));
+                pm.put(new Key(x,y), pixel);
+                //TODO
+
+            }
+        }
 
         this.setChangeRate(changeRateUserComponent);
-        lastMinimalCounterState = 1;
     }
+
+    @Deprecated
+    private double distance(PixelPoint point1, PixelPoint point2) {
+        return point1.distance(point2);
+    }
+
+    //TODO Gradle
 
     public void makeHole(int[] location, int radius) {
         double distance = -1;
@@ -366,5 +407,11 @@ private boolean tokenKitHole = true;
 
     }
 
+    public Map<Key, PixelPoint> getPm() {
+        return pm;
+    }
 
+    public void setPm(Map<Key, PixelPoint> pm) {
+        this.pm = pm;
+    }
 }

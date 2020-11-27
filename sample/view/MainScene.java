@@ -10,6 +10,8 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import sample.controller.Controller;
+import sample.model.Key;
+import sample.model.PixelPoint;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -99,6 +101,22 @@ public class MainScene {
             for(int y=0; y<pixels[0].length; y++) {
                 pixelWriter.setColor(y, i, pixels[i][y]);
             }
+        }
+
+        //TODO Keine Casts
+//        pixelWriter.setColor(0, 0, Color.CHOCOLATE);
+    }
+
+    public void writePixels(Map<Key, PixelPoint> pm){
+        GraphicsContext gc = drawingGround.getGraphicsContext2D();
+        PixelWriter pixelWriter = gc.getPixelWriter();
+
+        for(int x=0; x<drawingGround.getWidth(); x++){
+
+            for(int y=0; y<drawingGround.getHeight(); y++) {
+                pixelWriter.setColor(x,y,pm.get(new Key(x,y)).getColor());
+            }
+
         }
 
         //TODO Keine Casts
