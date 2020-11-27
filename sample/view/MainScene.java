@@ -58,26 +58,30 @@ public class MainScene {
     @FXML
     public void buttonStartAnimation() {
         controller.initAnimation();
-        boolean sepiaTone = Math.random() > 0.9;
+        boolean sepiaTone = Math.random() > 0.95;
         if(sepiaTone) drawingGround.setEffect(new SepiaTone());
         else drawingGround.setEffect(null);
     }
 
     @FXML
     public void sliderSet(){
+
         controller.sliderValueChanged(slider.getValue());
     }
 
     @FXML
     public void buttonClear() {
+
         controller.deleteAllData();
     }
 
     public Controller getController() {
+
         return controller;
     }
 
     public void setController(Controller controller) {
+
         this.controller = controller;
     }
 
@@ -111,15 +115,10 @@ public class MainScene {
         GraphicsContext gc = drawingGround.getGraphicsContext2D();
         PixelWriter pixelWriter = gc.getPixelWriter();
 
-        for(int x=0; x<drawingGround.getWidth(); x++){
-
-            for(int y=0; y<drawingGround.getHeight(); y++) {
-                pixelWriter.setColor(x,y,pm.get(new Key(x,y)).getColor());
-            }
-
-        }
+        pm.forEach( (key, pixel) -> {
+            pixelWriter.setColor(key.getX(),key.getY(),pixel.getColor());
+        });
 
         //TODO Keine Casts
-//        pixelWriter.setColor(0, 0, Color.CHOCOLATE);
     }
 }

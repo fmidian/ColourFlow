@@ -6,18 +6,19 @@ import java.util.*;
 
 public class Model {
 
-private Color[] [] pixelModel;
+private Color[] [] deprecatedModel;
 private int [] firstPixel;
-private final Color startTransparentColor = new Color(0,0,0,0);
 double changerate = 0.1;
 double changeRateUserComponent = 0.1;
 private int lastMinimalCounterState = 1;
 int cornerCounter = 0;
 
+private final Color startTransparentColor = new Color(0,0,0,0);
+
 //New
-private Map<Key, PixelPoint> pm = new HashMap<Key, PixelPoint>();
+private Map<Key, PixelPoint> pixelModel = new HashMap<Key, PixelPoint>();
 private PixelPoint middlePixel;
-private final int granularity = 300;
+private final int granularity = 400;
 private PixelPoint notColoured;
 private int height;
 private int width;
@@ -32,38 +33,38 @@ private int width;
 private boolean tokenKitHole = true;
 
     private boolean fillCorner() {
-
-        //TODO Eventuell wie fillHoles ?
-        cornerCounter = 0;
-        if(! pixelModel[0][0].equals(startTransparentColor) && ! pixelModel[pixelModel.length-1][0].equals(startTransparentColor)) {
-//            System.out.println("Ended");
-            return true;
-        }
-            for(int i=firstPixel[0]; i<pixelModel.length; i++) {
-            for(int v=0; v<pixelModel[0].length; v++){
-                if(pixelModel[i][v].equals(startTransparentColor)) {
-                    pixelModel[i][v] = determineColorByOtherPixels(i, v);
-                    cornerCounter++;
-                }
-            }
-            if(cornerCounter > 1) break;
-            }
-
-        cornerCounter = 0;
-        for(int i=firstPixel[0]; i<pixelModel.length; i--) {
-            for(int v=0; v<pixelModel[0].length; v++){
-                if(pixelModel[i][v].equals(startTransparentColor)) {
-                    pixelModel[i][v] = determineColorByOtherPixels(i, v);
-                    cornerCounter++;
-                }
-            }
-            if(cornerCounter > 1) break;
-        }
+//
+//        //TODO Eventuell wie fillHoles ?
+//        cornerCounter = 0;
+//        if(! deprecatedModel[0][0].equals(startTransparentColor) && ! deprecatedModel[deprecatedModel.length-1][0].equals(startTransparentColor)) {
+////            System.out.println("Ended");
+//            return true;
+//        }
+//            for(int i = firstPixel[0]; i< deprecatedModel.length; i++) {
+//            for(int v = 0; v< deprecatedModel[0].length; v++){
+//                if(deprecatedModel[i][v].equals(startTransparentColor)) {
+//                    deprecatedModel[i][v] = determineColorByOtherPixels(i, v);
+//                    cornerCounter++;
+//                }
+//            }
+//            if(cornerCounter > 1) break;
+//            }
+//
+//        cornerCounter = 0;
+//        for(int i = firstPixel[0]; i< deprecatedModel.length; i--) {
+//            for(int v = 0; v< deprecatedModel[0].length; v++){
+//                if(deprecatedModel[i][v].equals(startTransparentColor)) {
+//                    deprecatedModel[i][v] = determineColorByOtherPixels(i, v);
+//                    cornerCounter++;
+//                }
+//            }
+//            if(cornerCounter > 1) break;
+//        }
 
         return false;
     }
 
-    public void addPixels(int counter) {
+    public boolean addPixels(int counter) {
 //        if(! pixelModel[firstPixel[0]][0].equals(startTransparentColor)) {
 ////        if(lastMinimalCounterState > firstPixel[1]) {
 ////            System.out.println("last "+lastMinimalCounterState);
@@ -74,111 +75,30 @@ private boolean tokenKitHole = true;
 
         //TODO Fließbewegung
 
-        floatMovement(counter);
+        return floatMovement(counter);
     }
 
-    private void floatMovement(int counter) {
-        for(int c = counter; c<counter+1; c++){
-            if (c <= granularity) {
-                //Naiver Ansatz über gesamte Map
-                //TODO
+    private boolean floatMovement(int counter) {
 
-                double currentAltitude = 1 - (double)c / granularity;
-                double oldAltitude = 1 - (double) (c - 1) / granularity;
-                for (int x = 0; x < width; x++) {
-                    for (int y = 0; y < height; y++) {
-                        PixelPoint pixel = pm.get(new Key(x, y));
+            if (counter <= granularity) {
+                //Naive Approach over the whole map. On my computer there are no performance problems.
+                //If there are problems, you could use a copy of pixelModel and remove the set pixels maybe
+
+                double currentAltitude = 1 - (double)counter / granularity;
+                double oldAltitude = 1 - (double) (counter - 1) / granularity;
+
+                pixelModel.forEach( (key, pixel) -> {
                         if (pixel.getAltitude() >= currentAltitude && pixel.getAltitude() < oldAltitude) {
-                            pixel.setColor(detNewPixelColor(pixel,1));
+                            pixel.setColor(determineNewPixelColor(pixel,1));
                         }
-                    }
-                }
+                });
+                return false;
             }
-        }
 
-
-
-        //TODO Maybe copy pm and remove Values there
-//        public void iterateUsingEntrySet(Map<String, Integer> map) {
-//            for (Map.Entry<String, Integer> entry : map.entrySet()) {
-//                System.out.println(entry.getKey() + ":" + entry.getValue());
-//            }
-//        }
+            else return true;
     }
 
-    private boolean circleMovement(int counter) {
-        int yPos = firstPixel[0] - counter;
-        int xPos = firstPixel[1] - counter;
-        double distance = 1;
-        boolean allPixelsFilled = true;
-
-        for(int z=lastMinimalCounterState; z<= counter; z++) {
-            allPixelsFilled = true;
-            yPos = firstPixel[0] - z;
-            xPos = firstPixel[1] - z;
-
-            for (yPos = yPos; yPos < firstPixel[0] + z; yPos++) {
-//            yPos = yPos >= pixelModel.length ? pixelModel.length-1 : yPos;
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) {
-                    continue;
-                }
-                distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
-                if (distance <= counter) {
-                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-                } else {
-                    allPixelsFilled = false;
-                }
-            }
-
-            for (xPos = xPos; xPos < firstPixel[1] + z; xPos++) {
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) {
-                    continue;
-                }
-//            xPos = xPos >= pixelModel[0].length ? pixelModel[0].length-1 : xPos;
-//            yPos = yPos >= pixelModel.length ? pixelModel.length-1 : yPos;
-                distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
-                if (distance <= counter) {
-                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-                } else {
-                    allPixelsFilled = false;
-                }
-            }
-
-            for (yPos = yPos; yPos > firstPixel[0] - z; yPos--) {
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0){
-                    continue;
-                }
-//            yPos = yPos<0 ? 0 : yPos;
-//            xPos = xPos >= pixelModel[0].length ? pixelModel[0].length-1 : xPos;
-                distance = Math.sqrt((Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2));
-                if (distance <= counter) {
-                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-                } else {
-                    allPixelsFilled = false;
-                }
-            }
-
-            for (xPos = xPos; xPos > firstPixel[1] - z; xPos--) {
-                if (xPos >= pixelModel[0].length || xPos < 0 || yPos >= pixelModel.length || yPos < 0) {
-                    continue;
-                }
-//            xPos = xPos<0 ? 0 : xPos;
-//            yPos = yPos<0 ? 0 : yPos;
-                double test = (Math.pow(xPos - firstPixel[1],2)) + Math.pow((yPos - firstPixel[0]),2);
-                distance = Math.sqrt(test);
-                if (distance <= counter) {
-                    pixelModel[yPos][xPos] = determineColorByOtherPixels(yPos, xPos);
-                } else {
-                    allPixelsFilled = false;
-                }
-            }
-            if(allPixelsFilled) lastMinimalCounterState = z>lastMinimalCounterState? z : lastMinimalCounterState;
-
-        }
-        return false;
-    }
-
-    private Color detNewPixelColor (PixelPoint pixel, int searchArea) {
+    private Color determineNewPixelColor(PixelPoint pixel, int searchArea) {
         double red = 0.0;
         double green = 0.0;
         double blue = 0.0;
@@ -186,7 +106,7 @@ private boolean tokenKitHole = true;
 
         for(int x=-searchArea; x<searchArea+1; x++){
             for(int y=-searchArea; y<searchArea+1; y++){
-                PixelPoint p = pm.getOrDefault(new Key((int) pixel.getX()+x, (int) pixel.getY()+y), middlePixel);
+                PixelPoint p = pixelModel.getOrDefault(new Key((int) pixel.getX()+x, (int) pixel.getY()+y), middlePixel);
                 if(! p.getColor().equals(startTransparentColor)){
                     red += p.getColor().getRed();
                     green += p.getColor().getGreen();
@@ -196,99 +116,24 @@ private boolean tokenKitHole = true;
             }
         }
         if(includedPixels == 0) {
-//            red += middlePixel.getColor().getRed();
-//            green += middlePixel.getColor().getGreen();
-//            blue += middlePixel.getColor().getBlue();
-//            red=0;
-//            blue=0;
-//            green=0;
-//            includedPixels+=1;
-            System.out.println(searchArea);
-            return detNewPixelColor(pixel, searchArea+1);
-            //Yaaaai Rekursion
+            return determineNewPixelColor(pixel, searchArea+1);
+            //Yeah, I can use recursion in a probably meaningful context
         }
 
-        boolean modeChangeAll = Math.random() > 0.995;
         red/=includedPixels;
         green/=includedPixels;
         blue/=includedPixels;
-        double pickChangedColour = Math.random();
-        if(modeChangeAll || pickChangedColour < 0.33) {
-            red += (Math.random() - 0.5)*changerate;
-            if(red > 1.0) red = 1.0;
-            else if(red < 0.0) red = 0.0;
-        }
-        if(modeChangeAll || pickChangedColour > 0.66){
-            green += (Math.random() - 0.5)*changerate;
-            if(green > 1.0) green = 1.0;
-            else if(green < 0.0) green = 0.0;
-        }
-        if(modeChangeAll || (pickChangedColour > 0.33 && pickChangedColour <0.66)) {
-            blue += (Math.random() - 0.5)*changerate;
-            if(blue > 1.0) blue = 1.0;
-            else if(blue < 0.0) blue = 0.0;
-        }
-        return new Color(red, green, blue, 1);
-    }
+        red += (Math.random() - 0.5)*changerate;
+        if(red > 1.0) red = 1.0;
+        else if(red < 0.0) red = 0.0;
 
-    @Deprecated
-    private Color determineColorByOtherPixels(int yPos, int xPos) {
-        double red = 0.0;
-        double green = 0.0;
-        double blue = 0.0;
-        int includedPixels = 0;
+        green += (Math.random() - 0.5)*changerate;
+        if(green > 1.0) green = 1.0;
+        else if(green < 0.0) green = 0.0;
 
-        if(yPos > 0 && ! pixelModel[yPos-1][xPos].equals(startTransparentColor)) {
-            red += pixelModel[yPos-1][xPos].getRed();
-            green += pixelModel[yPos-1][xPos].getGreen();
-            blue += pixelModel[yPos-1][xPos].getBlue();
-            includedPixels+=1;
-        }
-        if(yPos > 0 && xPos > 0 && ! pixelModel[yPos-1][xPos-1].equals(startTransparentColor)) {
-            red += pixelModel[yPos-1][xPos-1].getRed();
-            green += pixelModel[yPos-1][xPos-1].getGreen();
-            blue += pixelModel[yPos-1][xPos-1].getBlue();
-            includedPixels+=1;
-        }
-        if(xPos > 0 && yPos <pixelModel.length-1 && ! pixelModel[yPos+1][xPos-1].equals(startTransparentColor)) {
-            red += pixelModel[yPos+1][xPos-1].getRed();
-            green += pixelModel[yPos+1][xPos-1].getGreen();
-            blue += pixelModel[yPos+1][xPos-1].getBlue();
-            includedPixels+=1;
-        }
-        if(yPos <pixelModel.length-1 && xPos < pixelModel[0].length-1 && ! pixelModel[yPos+1][xPos+1].equals(startTransparentColor)) {
-            red += pixelModel[yPos+1][xPos+1].getRed();
-            green += pixelModel[yPos+1][xPos+1].getGreen();
-            blue += pixelModel[yPos+1][xPos+1].getBlue();
-            includedPixels+=1;
-        }
-        if(includedPixels == 0) {
-            red += pixelModel[firstPixel[1]][firstPixel[0]].getRed();
-            green += pixelModel[firstPixel[1]][firstPixel[0]].getGreen();
-            blue += pixelModel[firstPixel[1]][firstPixel[0]].getBlue();
-            includedPixels+=1;
-        }
-
-        boolean modeChangeAll = Math.random() > 0.99995;
-        red/=includedPixels;
-        green/=includedPixels;
-        blue/=includedPixels;
-        double pickChangedColour = Math.random();
-        if(modeChangeAll || pickChangedColour < 0.33) {
-            red += (Math.random() - 0.5)*changerate;
-            if(red > 1.0) red = 1.0;
-            else if(red < 0.0) red = 0.0;
-        }
-        if(modeChangeAll || pickChangedColour > 0.66){
-            green += (Math.random() - 0.5)*changerate;
-            if(green > 1.0) green = 1.0;
-            else if(green < 0.0) green = 0.0;
-        }
-        if(modeChangeAll || (pickChangedColour > 0.33 && pickChangedColour <0.66)) {
-            blue += (Math.random() - 0.5)*changerate;
-            if(blue > 1.0) blue = 1.0;
-            else if(blue < 0.0) blue = 0.0;
-        }
+        blue += (Math.random() - 0.5)*changerate;
+        if(blue > 1.0) blue = 1.0;
+        else if(blue < 0.0) blue = 0.0;
 
         return new Color(red, green, blue, 1);
     }
@@ -314,35 +159,39 @@ private boolean tokenKitHole = true;
         middlePixel = new PixelPoint((int)Math.round( width / 2.0), (int)Math.round( height/ 2.0), 1.0);
         middlePixel.setColor(new Color(Math.random(), Math.random(), Math.random(),1));
         double maximumDistance = middlePixel.distance(new PixelPoint (0,0,0));
+
         for(int x=0; x<(size.get("width")); x++){
             for(int y=0; y<(size.get("height")); y++) {
                 PixelPoint pixel = new PixelPoint(x,y, 0, startTransparentColor);
                 double altitude = 1 - pixel.distance(middlePixel) / maximumDistance;
                 pixel.setAltitude(altitude);
-                pm.put(new Key(x,y), pixel);
+                pixelModel.put(new Key(x,y), pixel);
                 //TODO
             }
         }
-        pm.put(new Key((int) middlePixel.getX(), (int) middlePixel.getY()), middlePixel);
+        pixelModel.put(new Key((int) middlePixel.getX(), (int) middlePixel.getY()), middlePixel);
 
         this.setChangeRate(changeRateUserComponent);
-        randomObstacle();
+        addRandomObstacles();
     }
 
-    private void randomObstacle() {
+    private void addRandomObstacles() {
         for(int i=0; i<100000; i++) {
+//            long space = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+//            if(space > 200000000) System.out.println("Used space: "+space+ "  Total space: "+Runtime.getRuntime().totalMemory());
+
             Key pos = new Key((int) (Math.random() * width), (int) (Math.random() * height));
 //            System.out.println(pos.getX()+ "             "+pos.getY());
-            PixelPoint p = pm.get(pos);
-            double newAlt = p.getAltitude() - Math.random()/100000;
+            PixelPoint p = pixelModel.get(pos);
+            double newAlt = p.getAltitude() - Math.random()/300;
             int size = 5;
             for (int x = (int)(- Math.random()*size); x < (int)(Math.random()*size); x++) {
                 for (int y = (int) (- Math.random()*size); y < (int)(Math.random()*size); y++) {
 //                    System.out.println(x+" "+y);
                     Key k = new Key(pos.getX()+x, pos.getY()+y);
-                    if(pm.containsKey(k)){
+                    if(pixelModel.containsKey(k)){
 //                        System.out.println(k.getX()+"  "+k.getY());
-                        PixelPoint pn = pm.get(k);
+                        PixelPoint pn = pixelModel.get(k);
                         pn.setAltitude(newAlt <= 0.0 ? pn.getAltitude() : newAlt);
                     }
 
@@ -356,11 +205,11 @@ private boolean tokenKitHole = true;
 
     public void makeHole(int[] location, int radius) {
         double distance = -1;
-        for(int i=0; i<pixelModel.length; i++) {
-            for(int v=0; v<pixelModel[0].length; v++){
+        for(int i = 0; i< deprecatedModel.length; i++) {
+            for(int v = 0; v< deprecatedModel[0].length; v++){
                 distance = Math.sqrt((Math.pow(v - location[1],2)) + Math.pow((i - location[0]),2));
                 if(distance <= radius) {
-                    pixelModel[i][v] = startTransparentColor;
+                    deprecatedModel[i][v] = startTransparentColor;
                 }
             }
         }
@@ -377,124 +226,124 @@ private boolean tokenKitHole = true;
         tokenKitHole = true;
     }
 
-    public Color[][] getPixelModel() {
-        return pixelModel;
+    public Color[][] getDeprecatedModel() {
+        return deprecatedModel;
     }
 
     public void refillHole(){
-        if(tokenKitHole == false) {
-            return;
-        }
-        tokenKitHole = false;
-        Integer [] n;
-        try {
-            if (kitHole.size() > 0) {
-                ArrayList<Integer[]> temp = new ArrayList<Integer[]>();
-                boolean contained = false;
-                for (Integer[] pixel : kitHole) {
-                    pixelModel[pixel[0]][pixel[1]] = determineColorByOtherPixels(pixel[0], pixel[1]);
-                    if (pixel[0] == 0 || pixel[0] == pixelModel.length - 1 || pixel[1] == 0 || pixel[1] == pixelModel[0].length - 1) {
-                        continue;
-                    }
-                    if (pixelModel[pixel[0] - 1][pixel[1] - 1].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0] - 1, pixel[1] - 1};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-
-                    if (pixelModel[pixel[0]][pixel[1] - 1].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0], pixel[1] - 1};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                    if (pixelModel[pixel[0] - 1][pixel[1]].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0] - 1, pixel[1]};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                    if (pixelModel[pixel[0] + 1][pixel[1] - 1].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0] + 1, pixel[1] - 1};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                    if (pixelModel[pixel[0] - 1][pixel[1] + 1].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0] - 1, pixel[1] + 1};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals( n[0]) && x[1].equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                    if (pixelModel[pixel[0] + 1][pixel[1]].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0] + 1, pixel[1]};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals( n[0]) && x[1].equals( n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                    if (pixelModel[pixel[0]][pixel[1] + 1].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0], pixel[1] + 1};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0].equals(n[0]) && x[1] .equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                    if (pixelModel[pixel[0] + 1][pixel[1] + 1].equals(startTransparentColor)){
-                        n = new Integer[]{pixel[0] + 1, pixel[1] + 1};
-                        contained = false;
-                        for(Integer[] x: temp){
-                            if(x[0] .equals(n[0]) && x[1] .equals(n[1])) {
-                                contained = true;
-                                break;
-                            }
-                        }
-                        if(!contained) temp.add(n);
-                    }
-                }
-                kitHole.clear();
-                kitHole.addAll(temp);
-            }
-        }
-        catch(ConcurrentModificationException e){
-            System.out.println("Exception catched");
-            //TODO
-        }
-        tokenKitHole = true;
+//        if(tokenKitHole == false) {
+//            return;
+//        }
+//        tokenKitHole = false;
+//        Integer [] n;
+//        try {
+//            if (kitHole.size() > 0) {
+//                ArrayList<Integer[]> temp = new ArrayList<Integer[]>();
+//                boolean contained = false;
+//                for (Integer[] pixel : kitHole) {
+//                    deprecatedModel[pixel[0]][pixel[1]] = determineNewPixelColor(pixelModel.get(new Key(pixel[1])))
+//                    if (pixel[0] == 0 || pixel[0] == deprecatedModel.length - 1 || pixel[1] == 0 || pixel[1] == deprecatedModel[0].length - 1) {
+//                        continue;
+//                    }
+//                    if (deprecatedModel[pixel[0] - 1][pixel[1] - 1].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0] - 1, pixel[1] - 1};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//
+//                    if (deprecatedModel[pixel[0]][pixel[1] - 1].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0], pixel[1] - 1};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                    if (deprecatedModel[pixel[0] - 1][pixel[1]].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0] - 1, pixel[1]};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                    if (deprecatedModel[pixel[0] + 1][pixel[1] - 1].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0] + 1, pixel[1] - 1};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals(n[0]) && x[1].equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                    if (deprecatedModel[pixel[0] - 1][pixel[1] + 1].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0] - 1, pixel[1] + 1};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals( n[0]) && x[1].equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                    if (deprecatedModel[pixel[0] + 1][pixel[1]].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0] + 1, pixel[1]};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals( n[0]) && x[1].equals( n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                    if (deprecatedModel[pixel[0]][pixel[1] + 1].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0], pixel[1] + 1};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0].equals(n[0]) && x[1] .equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                    if (deprecatedModel[pixel[0] + 1][pixel[1] + 1].equals(startTransparentColor)){
+//                        n = new Integer[]{pixel[0] + 1, pixel[1] + 1};
+//                        contained = false;
+//                        for(Integer[] x: temp){
+//                            if(x[0] .equals(n[0]) && x[1] .equals(n[1])) {
+//                                contained = true;
+//                                break;
+//                            }
+//                        }
+//                        if(!contained) temp.add(n);
+//                    }
+//                }
+//                kitHole.clear();
+//                kitHole.addAll(temp);
+//            }
+//        }
+//        catch(ConcurrentModificationException e){
+//            System.out.println("Exception catched");
+//            //TODO
+//        }
+//        tokenKitHole = true;
     }
 
     public void deleteHoleData() {
@@ -511,11 +360,11 @@ private boolean tokenKitHole = true;
 
     }
 
-    public Map<Key, PixelPoint> getPm() {
-        return pm;
+    public Map<Key, PixelPoint> getPixelModel() {
+        return pixelModel;
     }
 
-    public void setPm(Map<Key, PixelPoint> pm) {
-        this.pm = pm;
+    public void setPixelModel(Map<Key, PixelPoint> pixelModel) {
+        this.pixelModel = pixelModel;
     }
 }

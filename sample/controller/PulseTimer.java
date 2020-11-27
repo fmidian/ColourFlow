@@ -1,21 +1,16 @@
 package sample.controller;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritablePixelFormat;
-import javafx.scene.paint.Color;
 import sample.model.Model;
 import sample.view.View;
-
-import java.nio.IntBuffer;
 
 public class PulseTimer extends AnimationTimer {
 
     private int counter = 1;
     private Model model;
     private View view;
+
+    long biggestSpace = 0;
 
     public PulseTimer(View view, Model model) {
         this.model = model;
@@ -31,18 +26,24 @@ public class PulseTimer extends AnimationTimer {
     private void doHandle() {
 //        Color [][] pixelModel = model.getPixelModel();
 //        if(counter > pixelModel.length || counter > pixelModel[0].length) stop();
-        model.addPixels(counter);
-//        if(ready) {
-//            stop();
-//            return;
-//        }
-        view.getMainScene().writePixels(model.getPm());
+        boolean ready = model.addPixels(counter);
+        if(ready) {
+            stop();
+            return;
+        }
+        view.getMainScene().writePixels(model.getPixelModel());
 
         model.refillHole();
 
         counter += 1;
 
         //TODO Save counter step
+
+//        long space = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+//        if(space > 200000000) {
+//            if(space > biggestSpace) biggestSpace = space;
+//            System.out.println("Biggest space: "+biggestSpace+ "  Total space: "+Runtime.getRuntime().totalMemory());
+//        }
 
         //stop wenn Button fehlt
     }

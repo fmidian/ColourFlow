@@ -35,7 +35,7 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                      </padding>
                   </Button>
-                  <Slider fx:id="slider" blockIncrement="5.0" max="40.0" onMouseReleased="#sliderSet" showTickLabels="true" value="10.0">
+                  <Slider fx:id="slider" blockIncrement="5.0" max="25.0" onMouseReleased="#sliderSet" showTickLabels="true" value="10.0">
                      <HBox.margin>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                      </HBox.margin>
