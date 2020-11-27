@@ -29,17 +29,20 @@ public class PulseTimer extends AnimationTimer {
 
 
     private void doHandle() {
-        Color [][] pixelModel = model.getPixelModel();
+//        Color [][] pixelModel = model.getPixelModel();
 //        if(counter > pixelModel.length || counter > pixelModel[0].length) stop();
-        boolean ready = model.addPixels(counter);
+        model.addPixels(counter);
 //        if(ready) {
 //            stop();
 //            return;
 //        }
-        view.getMainScene().writePixels(pixelModel);
-        counter+=1;
+        view.getMainScene().writePixels(model.getPm());
 
         model.refillHole();
+
+        counter += 1;
+
+        //TODO Save counter step
 
         //stop wenn Button fehlt
     }

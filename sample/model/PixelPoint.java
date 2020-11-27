@@ -16,6 +16,12 @@ public class PixelPoint extends Point2D
         this.altitude = altitude;
     }
 
+    public PixelPoint(int x, int y, double altitude, Color color) {
+        super(x,y);
+        this.altitude = altitude;
+        this.color = color;
+    }
+
     public double getAltitude() {
         return altitude;
     }

@@ -17,7 +17,10 @@ int cornerCounter = 0;
 //New
 private Map<Key, PixelPoint> pm = new HashMap<Key, PixelPoint>();
 private PixelPoint middlePixel;
-
+private final int granularity = 200;
+private PixelPoint notColoured;
+private int height;
+private int width;
 
 //TODO Use 2d Points import for coordinates
 //
@@ -27,9 +30,6 @@ private PixelPoint middlePixel;
 
     private ArrayList<Integer[]> kitHole = new ArrayList<Integer[]>();
 private boolean tokenKitHole = true;
-
-    public Model() {
-    }
 
     private boolean fillCorner() {
 
@@ -63,19 +63,47 @@ private boolean tokenKitHole = true;
         return false;
     }
 
-    public boolean addPixels(int counter) {
-        if(! pixelModel[firstPixel[0]][0].equals(startTransparentColor)) {
-//        if(lastMinimalCounterState > firstPixel[1]) {
-//            System.out.println("last "+lastMinimalCounterState);
-            return fillCorner();
-        }
+    public void addPixels(int counter) {
+//        if(! pixelModel[firstPixel[0]][0].equals(startTransparentColor)) {
+////        if(lastMinimalCounterState > firstPixel[1]) {
+////            System.out.println("last "+lastMinimalCounterState);
+//            return fillCorner();
+//        }
 
         //TODO Verästelung
 
         //TODO Fließbewegung
 
-        return circleMovement(counter);
+        floatMovement(counter);
+    }
 
+    private void floatMovement(int counter) {
+        for(int c = counter; c<counter+1; c++){
+            if (c <= granularity) {
+                //Naiver Ansatz über gesamte Map
+                //TODO
+
+                double currentAltitude = 1 - (double)c / granularity;
+                double oldAltitude = 1 - (double) (c - 1) / granularity;
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        PixelPoint pixel = pm.get(new Key(x, y));
+                        if (pixel.getAltitude() >= currentAltitude && pixel.getAltitude() < oldAltitude) {
+                            pixel.setColor(detNewPixelColor(pixel,1));
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        //TODO Maybe copy pm and remove Values there
+//        public void iterateUsingEntrySet(Map<String, Integer> map) {
+//            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+//                System.out.println(entry.getKey() + ":" + entry.getValue());
+//            }
+//        }
     }
 
     private boolean circleMovement(int counter) {
@@ -150,6 +178,60 @@ private boolean tokenKitHole = true;
         return false;
     }
 
+    private Color detNewPixelColor (PixelPoint pixel, int searchArea) {
+        double red = 0.0;
+        double green = 0.0;
+        double blue = 0.0;
+        int includedPixels = 0;
+
+        for(int x=-searchArea; x<searchArea+1; x++){
+            for(int y=-searchArea; y<searchArea+1; y++){
+                PixelPoint p = pm.getOrDefault(new Key((int) pixel.getX()+x, (int) pixel.getY()+y), middlePixel);
+                if(! p.getColor().equals(startTransparentColor)){
+                    red += p.getColor().getRed();
+                    green += p.getColor().getGreen();
+                    blue += p.getColor().getBlue();
+                    includedPixels+=1;
+                }
+            }
+        }
+        if(includedPixels == 0) {
+//            red += middlePixel.getColor().getRed();
+//            green += middlePixel.getColor().getGreen();
+//            blue += middlePixel.getColor().getBlue();
+//            red=0;
+//            blue=0;
+//            green=0;
+//            includedPixels+=1;
+            System.out.println(searchArea);
+            return detNewPixelColor(pixel, searchArea+1);
+            //Yaaaai Rekursion
+        }
+
+        boolean modeChangeAll = Math.random() > 0.995;
+        red/=includedPixels;
+        green/=includedPixels;
+        blue/=includedPixels;
+        double pickChangedColour = Math.random();
+        if(modeChangeAll || pickChangedColour < 0.33) {
+            red += (Math.random() - 0.5)*changerate;
+            if(red > 1.0) red = 1.0;
+            else if(red < 0.0) red = 0.0;
+        }
+        if(modeChangeAll || pickChangedColour > 0.66){
+            green += (Math.random() - 0.5)*changerate;
+            if(green > 1.0) green = 1.0;
+            else if(green < 0.0) green = 0.0;
+        }
+        if(modeChangeAll || (pickChangedColour > 0.33 && pickChangedColour <0.66)) {
+            blue += (Math.random() - 0.5)*changerate;
+            if(blue > 1.0) blue = 1.0;
+            else if(blue < 0.0) blue = 0.0;
+        }
+        return new Color(red, green, blue, 1);
+    }
+
+    @Deprecated
     private Color determineColorByOtherPixels(int yPos, int xPos) {
         double red = 0.0;
         double green = 0.0;
@@ -211,6 +293,7 @@ private boolean tokenKitHole = true;
         return new Color(red, green, blue, 1);
     }
 
+    @Deprecated
     public void generatePixelModel(Map<String, Integer> size) {
 //        this.pixelModel = new Color [size.get("height")][size.get("width")];
 //        for (Color[] row: pixelModel)
@@ -226,27 +309,47 @@ private boolean tokenKitHole = true;
 
     private void generateAltitude(Map<String, Integer> size) {
         Objects.requireNonNull(size);
-        middlePixel = new PixelPoint((int)Math.round(size.get("width") / 2.0), (int)Math.round(size.get("height") / 2.0), 1.0);
+        height = size.get("height");
+        width = size.get("width");
+        middlePixel = new PixelPoint((int)Math.round( width / 2.0), (int)Math.round( height/ 2.0), 1.0);
+        middlePixel.setColor(new Color(Math.random(), Math.random(), Math.random(),1));
         double maximumDistance = middlePixel.distance(new PixelPoint (0,0,0));
         for(int x=0; x<(size.get("width")); x++){
             for(int y=0; y<(size.get("height")); y++) {
-                PixelPoint pixel = new PixelPoint(x,y, 0);
+                PixelPoint pixel = new PixelPoint(x,y, 0, startTransparentColor);
                 double altitude = 1 - pixel.distance(middlePixel) / maximumDistance;
                 pixel.setAltitude(altitude);
-                pixel.setColor(new Color(altitude,0,0,1));
                 pm.put(new Key(x,y), pixel);
                 //TODO
-
             }
         }
+        pm.put(new Key((int) middlePixel.getX(), (int) middlePixel.getY()), middlePixel);
 
         this.setChangeRate(changeRateUserComponent);
+        randomObstacle();
     }
 
-    @Deprecated
-    private double distance(PixelPoint point1, PixelPoint point2) {
-        return point1.distance(point2);
+    private void randomObstacle() {
+        for(int i=0; i<10000; i++) {
+            Key pos = new Key((int) (Math.random() * width), (int) (Math.random() * height));
+//            System.out.println(pos.getX()+ "             "+pos.getY());
+            PixelPoint p = pm.get(pos);
+            double newAlt = p.getAltitude() - Math.random()/500;
+            for (int x = (int)(- Math.random()*8); x < (int)(Math.random()*8); x++) {
+                for (int y = (int) (- Math.random()*8); y < (int)(Math.random()*8); y++) {
+//                    System.out.println(x+" "+y);
+                    Key k = new Key(pos.getX()+x, pos.getY()+y);
+                    if(pm.containsKey(k)){
+//                        System.out.println(k.getX()+"  "+k.getY());
+                        PixelPoint pn = pm.get(k);
+                        pn.setAltitude(newAlt <= 0.0 ? pn.getAltitude() : newAlt);
+                    }
+
+                }
+            }
+        }
     }
+
 
     //TODO Gradle
 
