@@ -16,9 +16,7 @@ public class View {
     private Controller controller;
     private MainScene mainScene;
 
-
     public View(Model model, Stage primaryStage) {
-
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("sample.fxml"));
         Parent root = null;
@@ -29,7 +27,7 @@ public class View {
             e.printStackTrace();
         }
         mainScene = loader.getController();
-        primaryStage.setTitle("Colour-Progression");
+        primaryStage.setTitle("Colour Gradient");
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
     }
@@ -50,6 +48,5 @@ public class View {
     public MainScene getMainScene() {
         return mainScene;
     }
-
 
 }

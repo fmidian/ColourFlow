@@ -42,10 +42,6 @@ public class MainScene {
     private LocalDateTime mousePressed;
     private LocalDateTime mouseReleased;
 
-    public Canvas getDrawingGround() {
-        return drawingGround;
-    }
-
     @FXML
     public void mousePressed() {
         mousePressed = LocalDateTime.now();
@@ -55,7 +51,6 @@ public class MainScene {
     public void mouseReleased(MouseEvent event) {
         mouseReleased = LocalDateTime.now();
         long diff = ChronoUnit.MILLIS.between(mousePressed, mouseReleased);
-        System.out.println("Mousetime "+diff);
         controller.deleteHoleInDataAndRefill(diff, event);
     }
 
@@ -79,18 +74,7 @@ public class MainScene {
 
     @FXML
     public void buttonClear() {
-
         controller.deleteAllData();
-    }
-
-    public Controller getController() {
-
-        return controller;
-    }
-
-    public void setController(Controller controller) {
-
-        this.controller = controller;
     }
 
     public Map<String, Integer> getSizeOfCanvas () {
@@ -98,25 +82,10 @@ public class MainScene {
         Integer height = (int) drawingGround.getHeight();
         Integer width = (int) drawingGround.getWidth();
 
-
         Map<String, Integer> size = new HashMap<String, Integer>();
         size.put("height", height);
         size.put("width", width);
         return size;
-    }
-
-    public void writePixels(Color [][] pixels){
-        GraphicsContext gc = drawingGround.getGraphicsContext2D();
-        PixelWriter pixelWriter = gc.getPixelWriter();
-
-        for(int i=0; i<pixels.length; i++) {
-            for(int y=0; y<pixels[0].length; y++) {
-                pixelWriter.setColor(y, i, pixels[i][y]);
-            }
-        }
-
-        //TODO Keine Casts
-//        pixelWriter.setColor(0, 0, Color.CHOCOLATE);
     }
 
     public void writePixels(Map<Key, PixelPoint> pm){
@@ -126,7 +95,13 @@ public class MainScene {
         pm.forEach( (key, pixel) -> {
             pixelWriter.setColor(key.getX(),key.getY(),pixel.getColor());
         });
+    }
 
-        //TODO Keine Casts
+    public Controller getController() {
+        return controller;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 }
