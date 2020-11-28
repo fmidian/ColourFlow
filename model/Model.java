@@ -1,5 +1,6 @@
 package model;
 
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.time.Duration;
@@ -193,5 +194,62 @@ private double changerate = 0.1;
 
     public void setFlowageMode(boolean flowage) {
         flowageMode = flowage;
+    }
+
+    public void addImage(Image image){
+        Map<Key, PixelPoint> map = new HashMap<Key, PixelPoint>();
+
+        double smallestRed = 1.0;
+        double biggestRed = 0.0;
+        double imageSmallestRed = 1.0;
+        double imageBiggestRed = 0.0;
+
+        double imageWidth = image.getWidth();
+        double imageHeight = image.getHeight();
+
+        int startX = (int) (width - imageWidth)/2;
+        int startY = (int) (height - imageHeight)/2;
+
+        if(startX > 0 && startY >0){
+//            for (int x = 0; x < imageWidth; x++) {
+//                for (int y = 0; y < imageHeight; y++) {
+//                    double red = pixelModel.get(new Key(x,y)).getColor().getRed();
+//                    if(red < smallestRed) smallestRed = red;
+//                    else if(red > biggestRed) biggestRed = red;
+//
+//                    double imageRed = image.getPixelReader().getColor(x, y).getRed();
+//                    if(imageRed < imageSmallestRed) imageSmallestRed = imageRed;
+//                    else if(imageRed > imageBiggestRed) imageBiggestRed = imageRed;
+//                }
+//            }
+//            System.out.println("Smallest Red "+smallestRed+"    "+"Biggest Red "+biggestRed);
+//            System.out.println("Smallest Image Red "+imageSmallestRed+"    "+"Biggest ImageRed "+imageBiggestRed);
+
+            //TODO Umso mittiger, umso eher BildPixel
+
+            double imageRatio = 0.3;
+            PixelPoint imageMiddle = new PixelPoint((int) imageWidth/2, (int) imageHeight/2, 0);
+            double longestDistance = imageMiddle.distance(new PixelPoint(0,0,0));
+
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    double red = image.getPixelReader().getColor(x, y).getRed();
+                    double green = image.getPixelReader().getColor(x, y).getGreen();
+                    double blue = image.getPixelReader().getColor(x, y).getBlue();
+
+//                    if(red>=0.95 && green>=0.95 && blue>=0.95) continue;
+
+                    PixelPoint imagePixel = new PixelPoint(x,y,0);
+                    double dist = imagePixel.distance(imageMiddle);
+                    imageRatio = 1 - dist/longestDistance - 0.3;
+                    if(imageRatio<0) imageRatio = 0;
+
+                    PixelPoint p = pixelModel.get(new Key(x+startX,y+startY));
+                    Color old = p.getColor();
+                    p.setColor(new Color(old.getRed()*(1-imageRatio)+red*imageRatio, old.getGreen()*(1-imageRatio)+green*imageRatio, old.getBlue()*(1-imageRatio)+blue*imageRatio, 1));
+                }
+            }
+        }
+
     }
 }
