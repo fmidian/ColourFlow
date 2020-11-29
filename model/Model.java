@@ -115,7 +115,6 @@ private double changerate = 0.1;
                 double altitude = 1 - pixel.distance(middlePixel) / maximumDistance;
                 pixel.setAltitude(altitude);
                 pixelModel.put(new Key(x,y), pixel);
-                //TODO
             }
         }
         pixelModel.put(new Key((int) middlePixel.getX(), (int) middlePixel.getY()), middlePixel);

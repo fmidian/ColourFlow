@@ -7,6 +7,9 @@ import view.View;
 
 public class Main extends Application {
 
+    //Dependecies of the App: JavaFX and GSON
+    // Maybe there will be a gradle file in the future
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         Model model = new Model();

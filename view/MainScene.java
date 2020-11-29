@@ -37,12 +37,6 @@ import java.util.Objects;
 public class MainScene {
 
     @FXML
-    private Button startButton;
-
-    @FXML
-    private Button clearButton;
-
-    @FXML
     private Canvas drawingGround;
 
     @FXML
