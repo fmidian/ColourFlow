@@ -107,7 +107,7 @@ public class MainScene {
 
     public void searchForImage(){
         String query = searchField.getText();
-
+        System.out.println(query);
         URL url = null;
         try {
             url = new URL("https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ66meroj6dcVcTjzASEWRLMJSWidPCMg&cx=63af735600f800916&searchType=image&imgSize=medium&q="+query);
@@ -152,6 +152,13 @@ public class MainScene {
                 e.printStackTrace();
             }
 
+            //TODO Refactor Image Code
+
+            //TODO Hide API Key
+
+            //TODO What if there is no Internet?
+
+            //TODO Maybe bigger?
             con.disconnect();
 
             Gson g = new Gson();
