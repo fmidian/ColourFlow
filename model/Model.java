@@ -128,12 +128,16 @@ private double changerate = 0.1;
     }
 
     private void addRandomObstacles() {
-        Instant start = Instant.now();
-
         Key pos;
         int size = 5;
         final SplittableRandom random = new SplittableRandom();
         for(int i=0; i<100000; i++) {
+
+            //You can reduce this number (i) if there are any performance problems, but it works fine (you have to wait for 0.5 Second) on my computer
+            //In my opinion, the animation looks a lot better if i=100000 than if it's 50000 or 10000
+
+            //Question: Is there any way of doing this faster? I tried to use fast methods (for example Splittable Random)
+
             pos = new Key((random.nextInt(width)), random.nextInt(height));
             PixelPoint p = pixelModel.get(pos);
             double newAlt = p.getAltitude() - random.nextDouble()/300;
@@ -151,16 +155,7 @@ private double changerate = 0.1;
             }
 
         }
-        Instant finish = Instant.now();
-        long timeElapsed = Duration.between(start, finish).toMillis();
-        System.out.println(timeElapsed);
     }
-
-    /*
-            final SplittableRandom random = new SplittableRandom();
-        for(int i=0; i<100000; i++) {
-            pos = new Key((random.nextInt(width)), random.nextInt(height));
-     */
 
     //TODO Gradle
 
@@ -197,59 +192,34 @@ private double changerate = 0.1;
     }
 
     public void addImage(Image image){
-        Map<Key, PixelPoint> map = new HashMap<Key, PixelPoint>();
-
-        double smallestRed = 1.0;
-        double biggestRed = 0.0;
-        double imageSmallestRed = 1.0;
-        double imageBiggestRed = 0.0;
-
         double imageWidth = image.getWidth();
         double imageHeight = image.getHeight();
 
         int startX = (int) (width - imageWidth)/2;
         int startY = (int) (height - imageHeight)/2;
 
-        if(startX > 0 && startY >0){
-//            for (int x = 0; x < imageWidth; x++) {
-//                for (int y = 0; y < imageHeight; y++) {
-//                    double red = pixelModel.get(new Key(x,y)).getColor().getRed();
-//                    if(red < smallestRed) smallestRed = red;
-//                    else if(red > biggestRed) biggestRed = red;
-//
-//                    double imageRed = image.getPixelReader().getColor(x, y).getRed();
-//                    if(imageRed < imageSmallestRed) imageSmallestRed = imageRed;
-//                    else if(imageRed > imageBiggestRed) imageBiggestRed = imageRed;
-//                }
-//            }
-//            System.out.println("Smallest Red "+smallestRed+"    "+"Biggest Red "+biggestRed);
-//            System.out.println("Smallest Image Red "+imageSmallestRed+"    "+"Biggest ImageRed "+imageBiggestRed);
-
-            //TODO Umso mittiger, umso eher BildPixel
-
-            double imageRatio = 0.3;
+            double imageRatio; //You can see this as the probability, that the pixel is influenced by the image, and not the present colour
             PixelPoint imageMiddle = new PixelPoint((int) imageWidth/2, (int) imageHeight/2, 0);
             double longestDistance = imageMiddle.distance(new PixelPoint(0,0,0));
 
             for (int x = 0; x < image.getWidth(); x++) {
                 for (int y = 0; y < image.getHeight(); y++) {
+                    int xPosition = x+startX;
+                    int yPosition = y+startY;
+                    if(xPosition < 0 || yPosition <0 || xPosition >= width || yPosition >= height) continue;
                     double red = image.getPixelReader().getColor(x, y).getRed();
                     double green = image.getPixelReader().getColor(x, y).getGreen();
                     double blue = image.getPixelReader().getColor(x, y).getBlue();
-
-//                    if(red>=0.95 && green>=0.95 && blue>=0.95) continue;
 
                     PixelPoint imagePixel = new PixelPoint(x,y,0);
                     double dist = imagePixel.distance(imageMiddle);
                     imageRatio = 1 - dist/longestDistance - 0.3;
                     if(imageRatio<0) imageRatio = 0;
 
-                    PixelPoint p = pixelModel.get(new Key(x+startX,y+startY));
+                    PixelPoint p = pixelModel.get(new Key(xPosition,yPosition));
                     Color old = p.getColor();
                     p.setColor(new Color(old.getRed()*(1-imageRatio)+red*imageRatio, old.getGreen()*(1-imageRatio)+green*imageRatio, old.getBlue()*(1-imageRatio)+blue*imageRatio, 1));
                 }
             }
-        }
-
     }
 }

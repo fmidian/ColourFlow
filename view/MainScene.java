@@ -105,87 +105,10 @@ public class MainScene {
         return size;
     }
 
+    @FXML
     public void searchForImage(){
         String query = searchField.getText();
-        System.out.println(query);
-        URL url = null;
-        try {
-            url = new URL("https://www.googleapis.com/customsearch/v1?key=AIzaSyDJ66meroj6dcVcTjzASEWRLMJSWidPCMg&cx=63af735600f800916&searchType=image&imgSize=medium&q="+query);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        HttpURLConnection con = null;
-        try {
-            con = (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int status = 0;
-        try {
-            status = con.getResponseCode();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(status==200) {
-
-            BufferedReader in = null;
-            try {
-                in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String inputLine = "";
-            StringBuffer content = new StringBuffer();
-            while (true) {
-                try {
-                    if (!((inputLine = in.readLine()) != null)) break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                content.append(inputLine);
-            }
-            try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            //TODO Refactor Image Code
-
-            //TODO Hide API Key
-
-            //TODO What if there is no Internet?
-
-            //TODO Maybe bigger?
-            con.disconnect();
-
-            Gson g = new Gson();
-            JsonObject json = g.fromJson(content.toString(), JsonObject.class);
-            json.toString();
-            JsonArray items = json.get("items").getAsJsonArray();
-            String link = items.get(0).getAsJsonObject().get("link").toString();
-            link = link.substring(1, link.length()-1);
-            System.out.println(link);
-
-            URL linkUrl = null;
-            try {
-                linkUrl = new URL(link);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            BufferedImage bufferedImage = null;
-            try {
-                bufferedImage = ImageIO.read(linkUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Image image = SwingFXUtils.toFXImage(bufferedImage, null);
-
-            controller.setImage(image);
-        }
+        controller.setImage(query);
     }
 
     public void writePixels(Map<Key, PixelPoint> pm){
