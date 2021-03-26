@@ -156,8 +156,6 @@ private double changerate = 0.1;
         }
     }
 
-    //TODO Gradle
-
     public void makeHole(Key middlePosition, int radius) {
         PixelPoint middle = pixelModel.get(middlePosition);
         pixelModel.forEach( (key, pixel) -> {
