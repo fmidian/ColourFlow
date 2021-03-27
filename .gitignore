@@ -124,3 +124,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+#Property-File
+MyGoogleApi.properties
