@@ -5,3 +5,5 @@ ColourFlow creates images of random colour gradients. The first pixel in the mid
 
 ![pictureOfFlow](screenshots/flow.PNG?raw=true "Screenshot during flow")
 
+![pictureReady](screenshots/ready.PNG?raw=true "Screenshot during flow")
+
