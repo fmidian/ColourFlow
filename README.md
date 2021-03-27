@@ -7,12 +7,12 @@ ColourFlow creates images of random colour gradients. The first pixel in the mid
 
 ![pictureReady](screenshots/ready.PNG?raw=true "Screenshot during flow")
 
-# Features
+## Features
 Using the "Search"-Box it's possible to integrate an image matching the input in the colour gradient. An example with a search for "Harry Potter" is shown below.
 
 The kind of the flowage-animation can be changed using the checkbox "flowage". 
 
 The user can modify the changerate of random variation. Below there are to examples: one with minimum changerate and one with maximum changerate. 
 
-# Local Properties
+## Local Properties
 In order to use the "Search"-Feature you have to use a Google-API-Key and a corresponding SeachEngine-ID. Add these two strings to the GoogleApi.properties file.
