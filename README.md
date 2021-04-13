@@ -9,9 +9,11 @@ ColourFlow creates images of random colour gradients. The first pixel in the mid
 
 ## Features
 Using the "Search"-Box it's possible to integrate an image matching the input in the colour gradient. An example with a search for "charlie_chaplin" is shown below.
+
 ![pictureReady](screenshots/chaplin.PNG?raw=true "Screenshot during flow")
 
 The kind of the flowage-animation can be changed using the checkbox "flowage". An example of a different flowage type is shown below.
+
 ![pictureReady](screenshots/flowage.PNG?raw=true "Screenshot during flow")
 
 Also the user can modify the changerate of random variation.
